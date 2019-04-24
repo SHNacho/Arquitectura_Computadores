@@ -28,8 +28,8 @@
 #include <omp.h>
 
 
-//#define F
-#define D
+#define F
+//#define D
 
 int main(int argc, char** argv){
 
@@ -52,7 +52,7 @@ int main(int argc, char** argv){
 
   //Leer argumento de entrada (nº de hebras a usar)
   if (argc<2){
-    printf("Faltan nº componentes del vector\n");
+    printf("Faltan nº de hebras a usar\n");
     exit(-1);
   }
 
@@ -62,18 +62,23 @@ int main(int argc, char** argv){
   omp_set_num_threads(threads);
   //Inicializar vectores
   
-  t_ini = omp_get_wtime();
-  #pragma omp parallel for simd
-  for(i=0; i<TAM; ++i){
-    v1[i] = TAM*0.1+i*0.1; v2[i] = TAM*0.1-i*0.1;
+  #pragma omp parallel
+  {
+    t_ini = omp_get_wtime();
+    #pragma omp for simd
+    for(i=0; i<TAM; ++i){
+        v1[i] = TAM*0.1+i*0.1; v2[i] = TAM*0.1-i*0.1;
+    }
+    t_fin = omp_get_wtime();
+    
+    
+
+    #pragma omp for simd
+    for(i=0; i<TAM; ++i)
+        v3[i] = v1[i] * v2[i]; 
   }
-  t_fin = omp_get_wtime();
   
   t_total += t_fin-t_ini;
-
-  #pragma omp parallel for
-  for(i=0; i<TAM; ++i)
-    v3[i] = v1[i] * v2[i];
 
   //Imprimir tiempo
   printf("%11.9f\n", t_total);
